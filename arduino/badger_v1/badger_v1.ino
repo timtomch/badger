@@ -22,7 +22,7 @@ short int badge = 0;                       // Which badge to display
 
 char badgepaths[][50] = {"/BADGES/OCLS_01.WIF", "/BADGES/SWC_01.WIF","/BADGES/HELLO_01.WIF"};
 int nrofbadges = 3;
-char contact[] = "/BADGES/CONTACT_01.WIF";
+char contact[] = "/BADGES/CONTACT.WIF";
 
 // I/O setup
 void setup() {
@@ -73,21 +73,28 @@ void loop() {
     //Serial.println();
     Serial.println(badgepaths[badge]);
     
-    Serial.println(badge);
-    Serial.println(displaymode);
-    
     digitalWrite(LED_PIN, HIGH);
     EEPROM.write(BADGEDISPLAYED_ADDR, badge);
-    //ereader.display_wif(badgepaths[badge], 0, 0);
-    //ereader.show();
-    //ereader.sleep(4000); // allows EPD to power off gracefully
-    delay(200);
+    ereader.display_wif(badgepaths[badge], 0, 0);
+    ereader.show();
+    ereader.sleep(4000); // allows EPD to power off gracefully
     digitalWrite(LED_PIN, LOW);
   }
   if(digitalRead(UP_PIN)){
     Serial.println("Display contact information");
-    digitalWrite(LED_PIN, HIGH);
-    delay(200);
-    digitalWrite(LED_PIN, LOW);
+    
+    if (displaymode != 1){
+      displaymode = 1;
+      Serial.println(contact);
+      digitalWrite(LED_PIN, HIGH);
+      EEPROM.write(DISPLAYMODE_ADDR, displaymode);
+      ereader.display_wif(contact, 0, 0);
+      ereader.show();
+      ereader.sleep(4000); // allows EPD to power off gracefully
+      digitalWrite(LED_PIN, LOW);
+    }
+    else{
+      delay(200); // Leave time for finger to leave button before rerunning loop
+    }
   }
 }
